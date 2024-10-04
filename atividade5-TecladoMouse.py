@@ -19,14 +19,14 @@ def moverJogador(jogador, teclas, dimensaoJanela):
     if teclas["esquerda"] and jogador["objRect"].left > bordaEsquerda:
         jogador["objRect"].x -= jogador["vel"]
     
-    if teclas["esquerda"] and jogador["objRect"].right > bordaDireita:
-        jogador["objRect"].x -= jogador["vel"]
+    if teclas["direita"] and jogador["objRect"].right < bordaDireita:
+        jogador["objRect"].x += jogador["vel"]
 
-    if teclas["esquerda"] and jogador["objRect"].top > bordaSuperior:
+    if teclas["cima"] and jogador["objRect"].top > bordaSuperior:
         jogador["objRect"].y -= jogador["vel"]
 
-    if teclas["esquerda"] and jogador["objRect"].bottom > bordaInferior:
-        jogador["objRect"].y -= jogador["vel"]
+    if teclas["baixo"] and jogador["objRect"].bottom < bordaInferior:
+        jogador["objRect"].y += jogador["vel"]
 
 def moverBloco(bloco):
     bloco["objRect"].y += bloco ["vel"]
@@ -51,34 +51,20 @@ while deve_continuar:
         if evento.type == pygame.QUIT:
             deve_continuar = False
 
-    if evento.type == pygame.KEYDOWN:
-        if evento.key == pygame.K_ESCAPE:
-            deve_continuar = False
-        if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
-            teclas["esquerda"] = True
-        if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
-            teclas["direita"] = True
-        if evento.key == pygame.K_UP or evento.key == pygame.K_w:
-            teclas["cima"] = True
-        if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
-            teclas["baixo"] = True
-
-    if evento.type == pygame.KEYUP:
-        if evento.key == pygame.K_LEFT or evento.key == pygame.K_a:
-            teclas["esquerda"] = False
-        if evento.key == pygame.K_RIGHT or evento.key == pygame.K_d:
-            teclas["direita"] = False
-        if evento.key == pygame.K_UP or evento.key == pygame.K_w:
-            teclas["cima"] = False
-        if evento.key == pygame.K_DOWN or evento.key == pygame.K_s:
-            teclas["baixo"] = False
+    teclas = pygame.key.get_pressed()
+    teclas = {
+        "esquerda": teclas[pygame.K_LEFT] or teclas[pygame.K_a],
+        "direita": teclas[pygame.K_RIGHT] or teclas[pygame.K_d],
+        "cima": teclas[pygame.K_UP] or teclas[pygame.K_w],
+        "baixo": teclas[pygame.K_DOWN] or teclas[pygame.K_s],
+    }
 
     if evento.type == pygame.MOUSEBUTTONDOWN:
         blocos.append({"objRect": pygame.Rect(evento.pos[0], evento.pos[1], TAMANHOBLOCO, TAMANHOBLOCO), "cor": BRANCO, "vel": 1})
 
     contador += 1
     if contador >= INTERACOES:
-        CONTADOR = 0
+        contador = 0
         posX = random.randint(0, (LARGURAJANELA -TAMANHOBLOCO))
         posY = -TAMANHOBLOCO 
         velRandom = random.randint(1, (VEL + 3))
@@ -87,6 +73,7 @@ while deve_continuar:
     janela.fill(PRETO)
 
     moverJogador(jogador, teclas, (LARGURAJANELA, ALTURAJANELA))
+
     pygame.draw.rect(janela, jogador["cor"], jogador["objRect"])
 
     for bloco in blocos:
